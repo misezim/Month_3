@@ -5,6 +5,7 @@ from bot_config import bot, dp, database
 from handlers.start import start_router
 from handlers.other_messages import other_router
 from handlers.review_dialog import survey_router
+
 async def on_startup(bot):
     database.create_tables()
 

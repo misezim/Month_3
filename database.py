@@ -1,4 +1,5 @@
 import sqlite3
+
 class Database:
     def __init__(self, path: str):
         self.path = path
@@ -8,7 +9,7 @@ class Database:
             conn.execute("""CREATE TABLE IF NOT EXISTS reviews(
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             name TEXT,
-            phone_number INTEGER,
+            phone_number TEXT,
             food_rating INTEGER,
             cleanliness_rating INTEGER,
             extra_comments TEXT
