@@ -1,5 +1,8 @@
 import sqlite3
 
+from aiohttp.web_routedef import delete
+
+
 class Database:
     def __init__(self, path: str):
         self.path = path
@@ -15,6 +18,14 @@ class Database:
             extra_comments TEXT
             )
             """)
+            conn.execute("""CREATE TABLE IF NOT EXISTS dishes(
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT,
+            price FLOAT,
+            description TEXT,
+            category TEXT
+            )
+            """)
             conn.commit()
 
     def save_reviews(self, data: dict):
@@ -26,5 +37,16 @@ class Database:
 
                 """,
                 (data["name"], data["phone_number"], data["food_rating"], data["cleanliness_rating"], data["extra_comments"] )
+
+            )
+    def save_dish(self, data: dict):
+        with sqlite3.connect(self.path) as conn:
+            conn.execute(
+                """
+                INSERT INTO dishes (name, price, description, category)
+                VALUES (?, ?, ?, ?)
+
+                """,
+                (data["name"], data["price"], data["description"], data["category"])
 
             )
