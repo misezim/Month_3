@@ -50,3 +50,12 @@ class Database:
                 (data["name"], data["price"], data["description"], data["category"])
 
             )
+
+
+    def get_all_dishes(self):
+        with sqlite3.connect(self.path) as conn:
+            result = conn.execute("SELECT * FROM dishes"
+                                  " ORDER BY price DESC")
+            result.row_factory = sqlite3.Row
+            data = result.fetchall()
+            return [dict(row) for row in data]
