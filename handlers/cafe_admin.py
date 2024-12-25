@@ -1,6 +1,6 @@
 from aiogram import Router, F, types
 from aiogram. filters import Command
-from aiogram.fsm.state import StatesGroup, State
+from aiogram.fsm.state import StatesGroup, State, default_state
 from aiogram.fsm.context import FSMContext
 from bot_config import database
 
@@ -12,10 +12,18 @@ class NewDishes(StatesGroup):
     name = State()
     price = State()
     description = State()
+    cover = State()
     category= State()
 
-@new_menu_router.message(Command("new_dish"))
+@new_menu_router.message(Command("stop"))
+@new_menu_router.message(F.text == "стоп")
+async def stop_dialog(message: types.Message, state: FSMContext):
+    await state.clear()
+    await message.answer("Опрос остановлен")
+
+@new_menu_router.message(Command("new_dish"), default_state)
 async def create_new_dish(message: types.Message, state: FSMContext):
+    await message.answer("Для остановки введите слово 'стоп'")
     await message.answer("Введите название нового блюда")
     await state.set_state(NewDishes.name)
 
@@ -43,6 +51,16 @@ async def process_price(message: types.Message, state: FSMContext):
 async def process_name(message: types.Message, state: FSMContext):
     description = message.text
     await state.update_data(description=description)
+    await message.answer("Загрузите фотографию блюда")
+    await state.set_state(NewDishes.cover)
+
+@new_menu_router.message(NewDishes.cover, F.photo)
+async def process_cover(message: types.Message, state: FSMContext):
+    covers = message.photo
+    print(covers)
+    biggest_image = covers[-1]
+    biggest_image_id = biggest_image.file_id
+    await state.update_data(cover=biggest_image_id)
     kb = types.ReplyKeyboardMarkup(
         keyboard=
         [
@@ -62,6 +80,7 @@ async def process_name(message: types.Message, state: FSMContext):
     )
     await message.answer("Выберите к какой категории относится это блюдо: ", reply_markup=kb)
     await state.set_state(NewDishes.category)
+
 
 @new_menu_router.message(NewDishes.category)
 async def process_genre(message: types.Message, state: FSMContext):

@@ -13,13 +13,19 @@ class RestaurantReview(StatesGroup):
     cleanliness_rating = State()
     extra_comments = State()
 
+@survey_router.message(Command("stop"))
+@survey_router.message(F.text == "стоп")
+async def stop_dialog(message: types.Message, state: FSMContext):
+    await state.clear()
+    await message.answer("Опрос остановлен")
+
 
 @survey_router.callback_query(F.data == "review")
 async def start_survey(callback_query: types.CallbackQuery, state: FSMContext):
+    await callback_query.message.answer("Для остановки введите слово 'стоп'")
     await callback_query.message.answer("Как вас зовут?")
     await state.set_state(RestaurantReview.name)
     await callback_query.answer()
-
 
 
 @survey_router.message(RestaurantReview.name)

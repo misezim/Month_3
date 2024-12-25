@@ -23,6 +23,7 @@ class Database:
             name TEXT,
             price FLOAT,
             description TEXT,
+            cover TEXT,
             category TEXT
             )
             """)
@@ -43,19 +44,19 @@ class Database:
         with sqlite3.connect(self.path) as conn:
             conn.execute(
                 """
-                INSERT INTO dishes (name, price, description, category)
-                VALUES (?, ?, ?, ?)
+                INSERT INTO dishes (name, price, description, cover, category)
+                VALUES (?, ?, ?, ?, ?)
 
                 """,
-                (data["name"], data["price"], data["description"], data["category"])
+                (data["name"], data["price"], data["description"], data["cover"], data["category"])
 
             )
 
 
-    def get_all_dishes(self):
+    def get_dishes_by_category(self):
         with sqlite3.connect(self.path) as conn:
-            result = conn.execute("SELECT * FROM dishes"
-                                  " ORDER BY price DESC")
+            result = conn.execute("""SELECT * FROM dishes 
+                                     ORDER BY price DESC""")
             result.row_factory = sqlite3.Row
             data = result.fetchall()
             return [dict(row) for row in data]
